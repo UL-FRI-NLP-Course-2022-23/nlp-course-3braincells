@@ -22,3 +22,8 @@
  
  ```pip install -r requirements.txt  ```
  
+ download spacy:
+ ```python -m spacy download en_core_web_sm```
+ 
+ run stanza and ntlk:
+ ```python run_models.py```
