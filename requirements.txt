@@ -1,0 +1,12 @@
+afinn
+matplotlib
+numpy
+nltk
+pandas
+pathy
+pavis
+scikit_learn
+spacy
+spacy_stanza
+stanza
+tqdm
