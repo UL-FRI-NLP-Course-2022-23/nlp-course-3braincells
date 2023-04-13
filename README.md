@@ -7,3 +7,12 @@ Team members:
  
 Group public acronym/name: burek
  > This value will be used for publishing marks/scores. It will be known only to you and not you colleagues.
+ 
+ Prerequisites
+ 
+ conda create -name=nlp python=3.7.4  
+ conda activate ame=nlp
+ git clone https://github.com/UL-FRI-NLP-Course-2022-23/nlp-course-3braincells.git
+ cd nlp-course-3braincells
+ pip install -r requirements.txt  
+ 
