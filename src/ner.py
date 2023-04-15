@@ -22,7 +22,7 @@ def get_entity_stanza(story):
 def clean_entities(entities):
     clean_ent = []
     # add strings if needed
-    unwanted = ['--', '\'s']
+    unwanted = ['--', '\'s', '-']
     #all lower cases
     entities = [x.lower() for x in entities]
 
@@ -45,15 +45,15 @@ def clean_entities(entities):
 
 if __name__ == "__main__":
     #path = "data/shortStories/"
-    f = open("../data/shortStories/The Most Dangerous Game.txt", "r")
+    f = open("../data/shortStories/old_sultan.txt", "r", encoding='utf-8')
     text = f.read()
 
     entities = get_entity_spacy(text)
-    # print("Spacy:", entities)
+    #print("Spacy:", entities)
     rez = clean_entities(entities)
     print("Spacy:", rez)
 
     entitiesStanza = get_entity_stanza(text)
-    # print("Stanza:", entitiesStanza)
+    #print("Stanza:", entitiesStanza)
     rezStanza = clean_entities(entitiesStanza)
     print("Stanza:", rezStanza)
