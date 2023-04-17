@@ -39,7 +39,7 @@ class Pipeline:
 
         # Extract characters from text (king, queen, fairy, ...)
         for character in self.characters:
-            pattern = r'\b(?:the\s)?(?:{}s|{}ies)+|{}\b'.format(character[:-1], character[:-1], character)
+            pattern = r'\b(?:the\s)?((?:{}s|{}ies)|{})\b'.format(character[:-1], character[:-1], character)
             matches = re.findall(pattern, text, re.IGNORECASE)
             if len(matches) > thrs:
                 character_matches[character] = len(matches)
@@ -49,8 +49,14 @@ class Pipeline:
         character_matches = sorted(character_matches.items(), key=lambda x: x[1], reverse=True)
         # Sort the matches by frequency in descending order
 
-        # print(animal_matches + character_matches + relative_matches)
-        return np.array(animal_matches + character_matches + relative_matches)[:, 0]
+        # Extract all Names?
+        pattern = r'\b(?:the\s)?[A-Z][a-z]+\s[A-Z][a-z]+\b'
+        str_arr, int_arr = np.unique(re.findall(pattern, text), return_counts=True)
+        # str_arr = np.array([words.replace('the ', '') for words in str_arr])
+        matches = list(zip(str_arr[int_arr > thrs], int_arr[int_arr > thrs]))
+
+        all_matches = np.array(animal_matches + character_matches + relative_matches + matches)
+        return all_matches[:, 0] if len(all_matches) > 0 else []
 
     def model_based_character_extraction(self, text, model = 'spacy'):
         nlp = spacy.load("en_core_web_sm")
