@@ -1,0 +1,34 @@
+{
+    "Characters": ["cinderella", "stepmother", "sisters", "godmother", "prince", "king", "queen"],
+    "Relationships": {
+        "cinderella": [
+            ["stepmother", -1],
+            ["sisters", -1],
+            ["godmother", 1],
+            ["prince", 1]
+        ],
+        "stepmother": [
+            ["cinderella", -1],
+            ["sisters", 1]
+        ],
+        "sisters": [
+            ["cinderella", -1],
+            ["stepmother", 1]
+        ],
+        "godmother": [
+            ["cinderella", 1]
+        ],
+        "prince": [
+            ["cinderella", 1]
+        ],
+        "king": [
+            ["cinderella", 1],
+            ["queen", 0]
+        ],
+        "queen": [
+            ["king", 0]
+        ]
+    },
+    "Protagonist": "cinderella",
+    "Antagonist": ""
+}
