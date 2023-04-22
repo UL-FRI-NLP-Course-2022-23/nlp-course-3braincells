@@ -1,0 +1,55 @@
+{
+    "Characters": ["king", "queen", "princess", "fairies", "old fairy", "old woman", "dwarf", "mopsey", "prince", "countryman"],
+    "Relationships": {
+        "king": [
+            ["queen", 1],
+            ["princess", 1],
+            ["fairies", 0],
+            ["old fairy", -1]
+        ],
+        "queen": [
+            ["king", 1],
+            ["princess", 1],
+            ["fairies", 0]
+        ],
+        "princess": [
+            ["king", 1],
+            ["queen", 1],
+            ["fairies", 1],
+            ["old fairy", -1],
+            ["old woman", 0],
+            ["prince", 1]
+        ],
+        "fairies": [
+            ["king", 1],
+            ["queen", 0],
+            ["old fairy", -1],
+            ["princess", 1]
+        ],
+        "old fairy": [
+            ["king", -1],
+            ["queen", -1],
+            ["princess", -1],
+            ["fairies", -1],
+            ["dwarf", 0]
+        ],
+        "old woman": [
+            ["princess", -1]
+        ],
+        "dwarf": [
+            ["old fairy", 0]
+        ],
+        "mopsey": [
+            ["old fairy", 0]
+        ],
+        "prince": [
+            ["countryman", 0],
+            ["princess", 1]
+        ],
+        "countryman": [
+            ["prince", 0]
+        ]
+    },
+    "Protagonist": "princess",
+    "Antagonist": "old fairy"
+}

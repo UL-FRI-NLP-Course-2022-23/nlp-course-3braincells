@@ -1,0 +1,31 @@
+{
+    "Characters": ["little red-cap", "mother", "grandmother", "wolf"],
+    "Relationships": {
+        "little red-cap": [
+            ["grandmother", 1],
+            ["mother", 1],
+            ["wolf", -1],
+            ["huntsman", 1]
+        ],
+        "grandmother": [
+            ["little red-cap", 1],
+            ["wolf", -1],
+            ["huntsman", 1]
+        ],
+        "mother": [
+            ["little red-cap", 1]
+        ],
+        "wolf": [
+            ["little red-cap", -1],
+            ["grandmother", -1],
+            ["huntsman", -1]
+        ],
+        "huntsman": [
+            ["wolf", -1],
+            ["little red-cap", 1],
+            ["grandmother", 1]
+        ]
+    },
+    "Protagonist": "little red-cap",
+    "Antagonist": "wolf"
+}
