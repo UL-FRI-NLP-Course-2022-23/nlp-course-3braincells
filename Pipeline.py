@@ -3,22 +3,36 @@ import argparse
 import pandas as pd
 import numpy as np
 import spacy
+import stanza
 
 
 class Pipeline:
     def __init__(self):
-        self.animals = ['fox', 'lion', 'tiger', 'bear', 'rabbit', 'deer', 'wolf', 'elephant', 'monkey', 'snake', 'zebra', 'giraffe', 'rhinoceros', 'hippopotamus', 'crocodile', 'alligator', 'jaguar', 'leopard', 'cheetah', 'hyena', 'buffalo', 'koala', 'kangaroo', 'panda', 'camel', 'horse', 'cow', 'sheep', 'goat', 'pig', 'chicken', 'duck', 'goose', 'turkey', 'parrot', 'owl', 'eagle', 'hawk', 'falcon', 'seagull', 'penguin', 'dolphin', 'whale', 'shark', 'octopus', 'crab', 'lobster', 'snail', 'spider', 'ant', 'bee', 'butterfly', 'moth', 'grasshopper', 'dragonfly', 'ladybug']
-        self.relatives = ['grandmother', 'grandfather', 'mother', 'father', 'sister', 'brother', 'aunt', 'uncle', 'cousin', 'niece', 'nephew', 'stepmother', 'stepfather', 'stepsister', 'stepbrother', 'half-sister', 'half-brother', 'in-law', 'daughter-in-law', 'son-in-law', 'mother-in-law', 'father-in-law', 'sister-in-law', 'brother-in-law', 'granddaughter', 'grandson', 'godmother', 'godfather']
-        self.characters = ['prince', 'princess', 'king', 'queen', 'witch', 'wizard', 'fairy', 'dragon', 'giant', 'dwarf', 'elf', 'mermaid', 'pirate', 'knight', 'sorcerer', 'sorceress', 'troll', 'ogre', 'gnome', 'vampire', 'werewolf', 'ghost', 'goblin', 'demon', 'angel', 'nymph', 'siren', 'centaur', 'griffin', 'phoenix', 'unicorn', 'pegasus', 'cyclops', 'minotaur', 'medusa', 'satyr', 'hydra', 'chimera', 'kraken']
+        self.animals = ['fox', 'lion', 'tiger', 'bear', 'rabbit', 'deer', 'wolf', 'elephant', 'monkey', 'snake',
+                        'zebra', 'giraffe', 'rhinoceros', 'hippopotamus', 'crocodile', 'alligator', 'jaguar', 'leopard',
+                        'cheetah', 'hyena', 'buffalo', 'koala', 'kangaroo', 'panda', 'camel', 'horse', 'cow', 'sheep',
+                        'goat', 'pig', 'chicken', 'duck', 'goose', 'turkey', 'parrot', 'owl', 'eagle', 'hawk', 'falcon',
+                        'seagull', 'penguin', 'dolphin', 'whale', 'shark', 'octopus', 'crab', 'lobster', 'snail',
+                        'spider', 'ant', 'bee', 'butterfly', 'moth', 'grasshopper', 'dragonfly', 'ladybug']
+        self.relatives = ['grandmother', 'grandfather', 'mother', 'father', 'sister', 'brother', 'aunt', 'uncle',
+                          'cousin', 'niece', 'nephew', 'stepmother', 'stepfather', 'stepsister', 'stepbrother',
+                          'half-sister', 'half-brother', 'in-law', 'daughter-in-law', 'son-in-law', 'mother-in-law',
+                          'father-in-law', 'sister-in-law', 'brother-in-law', 'granddaughter', 'grandson', 'godmother',
+                          'godfather']
+        self.characters = ['prince', 'princess', 'king', 'queen', 'witch', 'wizard', 'fairy', 'dragon', 'giant',
+                           'dwarf', 'elf', 'mermaid', 'pirate', 'knight', 'sorcerer', 'sorceress', 'troll', 'ogre',
+                           'gnome', 'vampire', 'werewolf', 'ghost', 'goblin', 'demon', 'angel', 'nymph', 'siren',
+                           'centaur', 'griffin', 'phoenix', 'unicorn', 'pegasus', 'cyclops', 'minotaur', 'medusa',
+                           'satyr', 'hydra', 'chimera', 'kraken']
 
     def _get_text(self, path):
         return "\n".join(pd.read_table(path, header=None)[0])
 
-    def extract_characters(self, path):
+    def extract_characters(self, path, model='spacy'):
         text = self._get_text(path)
-        return self.rule_based_character_extraction(text), self.model_based_character_extraction(text)
+        return self.rule_based_character_extraction(text), self.model_based_character_extraction(text, model)
 
-    def rule_based_character_extraction(self, text, thrs = 2):
+    def rule_based_character_extraction(self, text, thrs=2):
         animal_matches = {}
         relative_matches = {}
         character_matches = {}
@@ -58,34 +72,45 @@ class Pipeline:
         all_matches = np.array(animal_matches + character_matches + relative_matches + matches)
         return all_matches[:, 0] if len(all_matches) > 0 else []
 
-    def model_based_character_extraction(self, text, model = 'spacy'):
-        nlp = spacy.load("en_core_web_sm")
+    def model_based_character_extraction(self, text, model='spacy'):
+        # nlp = spacy.load("en_core_web_sm")
 
         if model == 'spacy':
             nlp = spacy.load("en_core_web_sm")
+            doc = nlp(text)
+            pred = np.unique([ent.text.lower() for ent in doc.ents if ent.label_ == "PERSON"])
+
+        elif model == 'stanza':
+            nlp = stanza.Pipeline(lang='en', processors='tokenize,ner', use_gpu=False)
+            doc = nlp(text)
+            pred = np.unique([ent.text.lower() for sent in doc.sentences for ent in sent.ents if ent.type == 'PERSON'])
         else:
             # TODO: add different models..
             return
-        
-        doc = nlp(text)
-        pred = np.unique([ent.text.lower() for ent in doc.ents if ent.label_ == "PERSON"])
+
+        # doc = nlp(text)
+        # pred = np.unique([ent.text.lower() for ent in doc.ents if ent.label_ == "PERSON"])
         return pred
-    
+
     def sentiment_analysis(self, text):
         pass
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-                    prog='CharacterInteractionPipeline',
-                    description='The pipeline extracts characters from the text, evaluates the interaction between the characters and builds a knowledge graph from the gathered information.',
-                    epilog='/')
+        prog='CharacterInteractionPipeline',
+        description='The pipeline extracts characters from the text, evaluates the interaction between the characters and builds a knowledge graph from the gathered information.',
+        epilog='/')
 
     parser.add_argument('-p', '--path', required=True, help='Path to text')
     args = vars(parser.parse_args())
 
     pipeline = Pipeline()
+    print("Characters Spacy:")
     characters = pipeline.extract_characters(args['path'])
     print(characters)
+    print("Characters Stanza")
+    charactersStanza = pipeline.extract_characters(args['path'], 'stanza')
+    print(charactersStanza)
 
     print("TODO: rest of the pipeline..")
