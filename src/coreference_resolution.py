@@ -1,0 +1,3 @@
+from corenlp import *
+corenlp = StanfordCoreNLP()  # wait a few minutes...
+corenlp.parse("Parse this sentence.")
