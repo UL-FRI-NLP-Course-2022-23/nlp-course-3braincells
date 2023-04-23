@@ -10,11 +10,9 @@
  
 # Prerequisites
 
- ```conda create -name=nlp python=3.7.4```
+ ```conda create -n nlp python=3.7.4```
  
- ```conda create -name=nlp python=3.7.4 ```
- 
- ```conda activate ame=nlp```
+ ```conda activate nlp```
  
  ```git clone https://github.com/UL-FRI-NLP-Course-2022-23/nlp-course-3braincells.git```
  
@@ -22,8 +20,24 @@
  
  ```pip install -r requirements.txt  ```
  
- download spacy:
+ ##### download spacy:
  ```python -m spacy download en_core_web_sm```
  
- run stanza and ntlk:
+ ##### run stanza and ntlk:
  ```python run_models.py```
+ 
+ ##### StanfordCoreNlp for coreference resolution:
+ 
+  1. download StanfordCoreNlp from site inside of the project: 
+  
+   ```https://stanfordnlp.github.io/CoreNLP/download.html?fbclid=IwAR2QLGJV0LcmgG-IEH7lebtiwNVlRnxR9FJdq8EY9oE71l3oFj_ha_lPzwM ```
+  
+  2. install package: ```unzip stanford-corenlp-4.5.4.zip```
+  
+  3. start server: 
+  
+  ```cd stanford-corenlp-4.5.4```
+
+  ```java -mx5g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -timeout 75000```
+ 
+ 4. add python package ```pycorenlp``` in requirements.txt and reinstall requirements.txt
