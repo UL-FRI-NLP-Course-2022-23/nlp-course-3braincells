@@ -6,7 +6,7 @@ import spacy
 import stanza
 import networkx as nx
 import matplotlib.pyplot as plt
-
+from sentiment_analysis import sentiment_one_character_stanza, sentiment_multiple_characters_stanza, sentiment_one_character_afinn, sentiment_multiple_characters_afinn
 
 class Pipeline:
     def __init__(self):
@@ -99,8 +99,22 @@ class Pipeline:
         # pred = np.unique([ent.text.lower() for ent in doc.ents if ent.label_ == "PERSON"])
         return pred
 
-    def sentiment_analysis(self, text):
-        pass
+    def sentiment_analysis(self, path, model, type, characters, offset):
+        text = self._get_text(path)
+        if model == "stanza":
+            nlp = stanza.Pipeline(lang='en', processors='tokenize,sentiment')
+            doc = nlp(text)
+            if type == "character":
+                sentiment = sentiment_multiple_characters_stanza(doc, characters, offset)
+            else:
+                sentiment = sentiment_one_character_stanza(doc, characters, offset)
+        else:
+            if type == "character":
+                sentiment = sentiment_multiple_characters_afinn(text, characters, offset)
+            else:
+                sentiment = sentiment_one_character_afinn(text, characters, offset)
+        return sentiment
+
 
 
     def knowledge_graph(info: dict, name:str = 'Knowdlege Graph', save:bool = False):
@@ -147,6 +161,8 @@ if __name__ == "__main__":
     # charactersStanza = pipeline.extract_characters(args['path'], 'stanza')
     # print(charactersStanza)
 
-    # TODO: 
+
+    sentiment = pipeline.sentiment_analysis(args['path'], "stanza", "relationship", characters, 0)
     # Add sentiment analysis code
     # Make a dictionary that resembles the ground truth annotations (Characters, Relationships)
+    info = {"Characters": characters, "Relationships": sentiment}
