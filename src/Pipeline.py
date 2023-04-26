@@ -1,3 +1,6 @@
+import logging
+logging.disable(logging.CRITICAL)
+
 import re
 import argparse
 import pandas as pd
@@ -6,12 +9,10 @@ import spacy
 import stanza
 import networkx as nx
 import matplotlib.pyplot as plt
-from sentiment_analysis import sentiment_one_character_stanza, sentiment_multiple_characters_stanza, sentiment_one_character_afinn, sentiment_multiple_characters_afinn
+from sentiment_analysis import *
 
-import logging
-logging.getLogger('stanza').setLevel(logging.CRITICAL)
-# logging.getLogger().setLevel(logging.ERROR)
-# stanza.logging.set_verbosity_level(logging.CRITICAL)
+logging.getLogger('stanza').setLevel(logging.WARNING) # Set the logging level to WARNING
+
 
 class Pipeline:
     def __init__(self):
@@ -85,8 +86,6 @@ class Pipeline:
         return all_matches[:, 0] if len(all_matches) > 0 else []
 
     def model_based_character_extraction(self, text, model='spacy'):
-        # nlp = spacy.load("en_core_web_sm")
-
         if model == 'spacy':
             nlp = spacy.load("en_core_web_sm")
             doc = nlp(text)
@@ -99,9 +98,7 @@ class Pipeline:
         else:
             # TODO: add different models..
             return
-
-        # doc = nlp(text)
-        # pred = np.unique([ent.text.lower() for ent in doc.ents if ent.label_ == "PERSON"])
+        
         return pred
 
     def sentiment_analysis(self, path, model, type, characters, offset):
@@ -146,8 +143,7 @@ class Pipeline:
         plt.show()
 
 
-
-# (Example) Run pipleline in terminal using: python3 Pipeline.py --path data/our_data/Cinderella.txt
+# (Example) Run pipleline in terminal using: python3 Pipeline.py --path ../data/our_data/Cinderella.txt
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -160,16 +156,13 @@ if __name__ == "__main__":
 
     print("Loading pipeline..")
     pipeline = Pipeline()
-    # print("Characters Spacy:")
     # characters = pipeline.extract_characters(args['path'])
-    # print(characters)
-    # print("Characters Stanza")
+
     print("Extracting characters..")
     characters = pipeline.extract_characters(args['path'], 'stanza')
-    # print(charactersStanza)
 
     print("Sentiment analysis..")
-    sentiment = pipeline.sentiment_analysis(args['path'], "stanza", "character", characters, 5)
+    sentiment = pipeline.sentiment_analysis(args['path'], "stanza", "character", characters, 3)
     # Add sentiment analysis code
     # Make a dictionary that resembles the ground truth annotations (Characters, Relationships)
     info = {"Characters": characters, "Relationships": sentiment}
