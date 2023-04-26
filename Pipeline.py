@@ -4,10 +4,13 @@ import pandas as pd
 import numpy as np
 import spacy
 import stanza
+import networkx as nx
+import matplotlib.pyplot as plt
 
 
 class Pipeline:
     def __init__(self):
+        # Common characters in folktale stories..
         self.animals = ['fox', 'lion', 'tiger', 'bear', 'rabbit', 'deer', 'wolf', 'elephant', 'monkey', 'snake',
                         'zebra', 'giraffe', 'rhinoceros', 'hippopotamus', 'crocodile', 'alligator', 'jaguar', 'leopard',
                         'cheetah', 'hyena', 'buffalo', 'koala', 'kangaroo', 'panda', 'camel', 'horse', 'cow', 'sheep',
@@ -28,9 +31,13 @@ class Pipeline:
     def _get_text(self, path):
         return "\n".join(pd.read_table(path, header=None)[0])
 
+    def filter_characters(self, characters):
+        return [re.sub(r'\bThe \b|[\.,;:?!-]', '', character).lower() for character in characters] # Remove 'The ' and signs from text
+
     def extract_characters(self, path, model='spacy'):
         text = self._get_text(path)
-        return self.rule_based_character_extraction(text), self.model_based_character_extraction(text, model)
+        return np.union1d(self.filter_characters(self.rule_based_character_extraction(text)), 
+                          self.filter_characters(self.model_based_character_extraction(text, model)))
 
     def rule_based_character_extraction(self, text, thrs=2):
         animal_matches = {}
@@ -96,6 +103,33 @@ class Pipeline:
         pass
 
 
+    def knowledge_graph(info: dict, name:str = 'Knowdlege Graph', save:bool = False):
+    # info is dictionary with 'Characters' and 'Relationships'
+    
+        color_map= {-1: 'red', 0: 'gray', 1: 'green'}    
+        G = nx.MultiGraph(name=name)
+
+        for character in info['Characters']:
+            G.add_node(character)
+
+        for character1, characters in info['Relationships'].items():
+            for character2, relationship in characters:
+                G.add_edge(character1, character2, value = relationship)
+
+        edge_colors = [color_map[rel['value']] for ch1, ch2, rel in G.edges(data=True)]
+        node_sizes  = [v * 500 for v in dict(G.degree()).values()]
+        
+        plt.figure(figsize=(10, 7))
+        nx.draw_circular(G, edge_color=edge_colors, node_size=node_sizes, with_labels=True, width=1.5, font_size=10)
+
+        plt.savefig(name+'.jpg') if save else None
+        plt.axis('off')
+        plt.show()
+
+
+
+# (Example) Run pipleline in terminal using: python3 Pipeline.py --path data/our_data/Cinderella.txt
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='CharacterInteractionPipeline',
@@ -109,8 +143,10 @@ if __name__ == "__main__":
     print("Characters Spacy:")
     characters = pipeline.extract_characters(args['path'])
     print(characters)
-    print("Characters Stanza")
-    charactersStanza = pipeline.extract_characters(args['path'], 'stanza')
-    print(charactersStanza)
+    # print("Characters Stanza")
+    # charactersStanza = pipeline.extract_characters(args['path'], 'stanza')
+    # print(charactersStanza)
 
-    print("TODO: rest of the pipeline..")
+    # TODO: 
+    # Add sentiment analysis code
+    # Make a dictionary that resembles the ground truth annotations (Characters, Relationships)
