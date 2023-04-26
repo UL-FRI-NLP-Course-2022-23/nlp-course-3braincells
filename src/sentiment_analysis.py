@@ -44,7 +44,7 @@ def is_character_in_sent(sentences, i, character, offset):
                 if character == word['text'].lower():
                     return True
     return False
-
+    
 def calculate_sent_sentiment(sentences, i, offset):
     sentiment = []
     for j in range(i - offset, i + offset + 1):
@@ -56,22 +56,28 @@ def sentiment_multiple_characters_stanza(doc, characters, offset):
     relationships = {}
     #makes a dictionary where the keys are the combinations of the characters in "john/jane" form
     # for i in range(len(characters)):
-        # for j in range(i + 1, len(characters)):
-            # relationships[f"{characters[i]}/{characters[j]}"] = []
+    #     for j in range(i + 1, len(characters)):
+    #         relationships[f"{characters[i]}/{characters[j]}"] = []
 
-    for s in range(len(doc.sentences)):
-        for i in range(len(characters)):
-            character_relationships = []
-            for j in range(i+1, len(characters)):
-                    if is_character_in_sent(doc.sentences, s, characters[i], offset) and is_character_in_sent(doc.sentences, s, characters[j], offset):
+    for i in range(len(characters)):
+        row = {}
+        for j in range(i+1, len(characters)):
+            row[characters[j]] = []
+            for s in range(len(doc.sentences)):
+                if is_character_in_sent(doc.sentences, s, characters[i], offset) and is_character_in_sent(doc.sentences, s, characters[j], offset):
                         # relationships[f"{characters[i]}/{characters[j]}"].append(calculate_sent_sentiment(doc.sentences, s, offset))
-                        character_relationships.append([characters[j], calculate_sent_sentiment(doc.sentences, s, offset)])
-            relationships[characters[i]] = character_relationships
-
-    # for key, value in relationships.items():
-        # relationships[key] = listToValue(value)
-    return relationships
-
+                    row[characters[j]].append(calculate_sent_sentiment(doc.sentences, s, offset))
+        relationships[characters[i]] = row
+        
+    final_relationships = {}
+    for key, value in relationships.items():
+        final_relationships[key] = []
+        for k, v in value.items():
+            final_value = listToValue(v)
+            if final_value:
+                final_relationships[key].append([k, final_value])
+    return final_relationships
+    
 def eval_afinn(sentences, i, offset):
     text = ""
     if offset == 0:
@@ -87,6 +93,7 @@ def eval_afinn(sentences, i, offset):
         return 0
     else:
         return -1
+    
 #function that evaluates the character sentiment based on the sentence in which the character is present
 #offset 0: evaluate only current sentence(contains character)
 #offset x: evaluate current sentence and sentences +/- x
@@ -109,20 +116,29 @@ def sentiment_multiple_characters_afinn(text, characters, offset):
     sentences = sent_tokenize(text)
     relationships = {}
     # makes a dictionary where the keys are the combinations of the characters in "john/jane" form
+    # for i in range(len(characters)):
+        # for j in range(i + 1, len(characters)):
+            # relationships[f"{characters[i]}/{characters[j]}"] = []
+
     for i in range(len(characters)):
-        for j in range(i + 1, len(characters)):
-            relationships[f"{characters[i]}/{characters[j]}"] = []
+        row = {}
+        for j in range(i+1, len(characters)):
+            row[characters[j]] = []
+            for s in range(len(sentences)):
+                if characters[i] in sentences[s].lower() and characters[j] in sentences[s].lower():
+                    score = eval_afinn(sentences, s, offset)
+                    # relationships[f"{characters[i]}/{characters[j]}"].append(score)
+                    row[characters[j]].append(score)
+        relationships[characters[i]] = row
 
-    for s in range(len(sentences)):
-        for i in range(len(characters)):
-            for j in range(i+1, len(characters)):
-                    if characters[i] in sentences[s].lower() and characters[j] in sentences[s].lower():
-                        score = eval_afinn(sentences, s, offset)
-                        relationships[f"{characters[i]}/{characters[j]}"].append(score)
-
+    final_relationships = {}
     for key, value in relationships.items():
-         relationships[key] = listToValue(value)
-    return relationships
+        final_relationships[key] = []
+        for k, v in value.items():
+            final_value = listToValue(v)
+            if final_value:
+                final_relationships[key].append([k, final_value])
+    return final_relationships
 
 if __name__ == "__main__":
     f = open("../data/our_data/cinderella.txt", "r", encoding='utf-8')

@@ -162,7 +162,7 @@ if __name__ == "__main__":
     characters = pipeline.extract_characters(args['path'], 'stanza')
 
     print("Sentiment analysis..")
-    sentiment = pipeline.sentiment_analysis(args['path'], "stanza", "character", characters, 3)
+    sentiment = pipeline.sentiment_analysis(args['path'], "afinn", "character", characters, 0)
     # Add sentiment analysis code
     # Make a dictionary that resembles the ground truth annotations (Characters, Relationships)
     info = {"Characters": characters, "Relationships": sentiment}
