@@ -44,27 +44,32 @@ def is_character_in_sent(sentences, i, character, offset):
                 if character == word['text'].lower():
                     return True
     return False
+
 def calculate_sent_sentiment(sentences, i, offset):
     sentiment = []
     for j in range(i - offset, i + offset + 1):
         if j >= 0 and j < len(sentences):
             sentiment.append(sentences[j].sentiment - 1)
     return listToValue(sentiment)
+
 def sentiment_multiple_characters_stanza(doc, characters, offset):
     relationships = {}
     #makes a dictionary where the keys are the combinations of the characters in "john/jane" form
-    for i in range(len(characters)):
-        for j in range(i + 1, len(characters)):
-            relationships[f"{characters[i]}/{characters[j]}"] = []
+    # for i in range(len(characters)):
+        # for j in range(i + 1, len(characters)):
+            # relationships[f"{characters[i]}/{characters[j]}"] = []
 
     for s in range(len(doc.sentences)):
         for i in range(len(characters)):
+            character_relationships = []
             for j in range(i+1, len(characters)):
                     if is_character_in_sent(doc.sentences, s, characters[i], offset) and is_character_in_sent(doc.sentences, s, characters[j], offset):
-                        relationships[f"{characters[i]}/{characters[j]}"].append(calculate_sent_sentiment(doc.sentences, s, offset))
+                        # relationships[f"{characters[i]}/{characters[j]}"].append(calculate_sent_sentiment(doc.sentences, s, offset))
+                        character_relationships.append([characters[j], calculate_sent_sentiment(doc.sentences, s, offset)])
+            relationships[characters[i]] = character_relationships
 
-    for key, value in relationships.items():
-        relationships[key] = listToValue(value)
+    # for key, value in relationships.items():
+        # relationships[key] = listToValue(value)
     return relationships
 
 def eval_afinn(sentences, i, offset):

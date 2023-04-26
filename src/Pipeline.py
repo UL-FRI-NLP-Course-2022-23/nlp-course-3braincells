@@ -8,6 +8,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from sentiment_analysis import sentiment_one_character_stanza, sentiment_multiple_characters_stanza, sentiment_one_character_afinn, sentiment_multiple_characters_afinn
 
+import logging
+logging.getLogger('stanza').setLevel(logging.CRITICAL)
+# logging.getLogger().setLevel(logging.ERROR)
+# stanza.logging.set_verbosity_level(logging.CRITICAL)
+
 class Pipeline:
     def __init__(self):
         # Common characters in folktale stories..
@@ -32,7 +37,7 @@ class Pipeline:
         return "\n".join(pd.read_table(path, header=None)[0])
 
     def filter_characters(self, characters):
-        return [re.sub(r'\bThe \b|[\.,;:?!-]', '', character).lower() for character in characters] # Remove 'The ' and signs from text
+        return [re.sub(r'\bThe \b|\bthe |[\.,;:?!-]|\'s', '', character).lower() for character in characters] # Remove 'The ' and signs from text
 
     def extract_characters(self, path, model='spacy'):
         text = self._get_text(path)
@@ -117,7 +122,7 @@ class Pipeline:
 
 
 
-    def knowledge_graph(info: dict, name:str = 'Knowdlege Graph', save:bool = False):
+    def knowledge_graph(self, info: dict, name:str = 'Knowdlege Graph', save:bool = False):
     # info is dictionary with 'Characters' and 'Relationships'
     
         color_map= {-1: 'red', 0: 'gray', 1: 'green'}    
@@ -131,7 +136,7 @@ class Pipeline:
                 G.add_edge(character1, character2, value = relationship)
 
         edge_colors = [color_map[rel['value']] for ch1, ch2, rel in G.edges(data=True)]
-        node_sizes  = [v * 500 for v in dict(G.degree()).values()]
+        node_sizes  = [(v+1) * 500 for v in dict(G.degree()).values()]
         
         plt.figure(figsize=(10, 7))
         nx.draw_circular(G, edge_color=edge_colors, node_size=node_sizes, with_labels=True, width=1.5, font_size=10)
@@ -153,16 +158,21 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--path', required=True, help='Path to text')
     args = vars(parser.parse_args())
 
+    print("Loading pipeline..")
     pipeline = Pipeline()
-    print("Characters Spacy:")
-    characters = pipeline.extract_characters(args['path'])
-    print(characters)
+    # print("Characters Spacy:")
+    # characters = pipeline.extract_characters(args['path'])
+    # print(characters)
     # print("Characters Stanza")
-    # charactersStanza = pipeline.extract_characters(args['path'], 'stanza')
+    print("Extracting characters..")
+    characters = pipeline.extract_characters(args['path'], 'stanza')
     # print(charactersStanza)
 
-
-    sentiment = pipeline.sentiment_analysis(args['path'], "stanza", "relationship", characters, 0)
+    print("Sentiment analysis..")
+    sentiment = pipeline.sentiment_analysis(args['path'], "stanza", "character", characters, 5)
     # Add sentiment analysis code
     # Make a dictionary that resembles the ground truth annotations (Characters, Relationships)
     info = {"Characters": characters, "Relationships": sentiment}
+
+    print("Finished!!")
+    pipeline.knowledge_graph(info)
