@@ -98,7 +98,7 @@ class Pipeline:
         else:
             # TODO: add different models..
             return
-        
+
         return pred
 
     def sentiment_analysis(self, path, model, type, characters, offset):
@@ -106,12 +106,12 @@ class Pipeline:
         if model == "stanza":
             nlp = stanza.Pipeline(lang='en', processors='tokenize,sentiment')
             doc = nlp(text)
-            if type == "character":
+            if type == "relationship":
                 sentiment = sentiment_multiple_characters_stanza(doc, characters, offset)
             else:
                 sentiment = sentiment_one_character_stanza(doc, characters, offset)
         else:
-            if type == "character":
+            if type == "relationship":
                 sentiment = sentiment_multiple_characters_afinn(text, characters, offset)
             else:
                 sentiment = sentiment_one_character_afinn(text, characters, offset)
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     characters = pipeline.extract_characters(args['path'], 'stanza')
 
     print("Sentiment analysis..")
-    sentiment = pipeline.sentiment_analysis(args['path'], "afinn", "character", characters, 0)
+    sentiment = pipeline.sentiment_analysis(args['path'], "stanza", "relationship", characters, 1)
     # Add sentiment analysis code
     # Make a dictionary that resembles the ground truth annotations (Characters, Relationships)
     info = {"Characters": characters, "Relationships": sentiment}

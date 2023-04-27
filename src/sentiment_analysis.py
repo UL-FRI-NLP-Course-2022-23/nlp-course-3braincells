@@ -44,7 +44,7 @@ def is_character_in_sent(sentences, i, character, offset):
                 if character == word['text'].lower():
                     return True
     return False
-    
+
 def calculate_sent_sentiment(sentences, i, offset):
     sentiment = []
     for j in range(i - offset, i + offset + 1):
@@ -68,16 +68,16 @@ def sentiment_multiple_characters_stanza(doc, characters, offset):
                         # relationships[f"{characters[i]}/{characters[j]}"].append(calculate_sent_sentiment(doc.sentences, s, offset))
                     row[characters[j]].append(calculate_sent_sentiment(doc.sentences, s, offset))
         relationships[characters[i]] = row
-        
+
     final_relationships = {}
     for key, value in relationships.items():
         final_relationships[key] = []
         for k, v in value.items():
             final_value = listToValue(v)
-            if final_value:
+            if final_value is not None:
                 final_relationships[key].append([k, final_value])
     return final_relationships
-    
+
 def eval_afinn(sentences, i, offset):
     text = ""
     if offset == 0:
@@ -93,7 +93,7 @@ def eval_afinn(sentences, i, offset):
         return 0
     else:
         return -1
-    
+
 #function that evaluates the character sentiment based on the sentence in which the character is present
 #offset 0: evaluate only current sentence(contains character)
 #offset x: evaluate current sentence and sentences +/- x
@@ -136,7 +136,7 @@ def sentiment_multiple_characters_afinn(text, characters, offset):
         final_relationships[key] = []
         for k, v in value.items():
             final_value = listToValue(v)
-            if final_value:
+            if final_value is not None:
                 final_relationships[key].append([k, final_value])
     return final_relationships
 
