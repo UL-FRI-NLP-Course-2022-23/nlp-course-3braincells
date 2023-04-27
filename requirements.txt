@@ -1,5 +1,4 @@
 afinn
-pycorenlp
 matplotlib
 numpy
 nltk
@@ -8,6 +7,7 @@ pathy
 pavis
 scikit_learn
 spacy
+spacy_stanza
 stanza
 tqdm
 networkx
