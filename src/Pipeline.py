@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from sentiment_analysis import *
 from fastcoref import spacy_component
 import os
-
+from utils import characters_accuracy, relationships_accuracy
 logging.getLogger('stanza').setLevel(logging.WARNING) # Set the logging level to WARNING
 
 
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
 
     #coreference flag
-    coref = True
+    coref = False
 
     print("Loading pipeline..")
     pipeline = Pipeline()
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     print("Sentiment analysis..")
     #possible options for model "stanza" and "afinn"
     # sentiment = pipeline.sentiment_analysis(args['path'], "afinn", "relationship", characters, 1)
-    sentiment = pipeline.sentiment_analysis(path, "afinn", "relationship", characters, 3)
+    sentiment = pipeline.sentiment_analysis(path, "afinn", "relationship", characters, 0)
 
     if(coref):
         if os.path.exists("../data/coreferenced_data/coref_file.txt"):
@@ -193,6 +193,22 @@ if __name__ == "__main__":
     info = {"Characters": characters, "Relationships": sentiment}
 
     print("Finished!!")
+
+    print("Calculating numerical results..")
+    correct, gd_number, all_charac = characters_accuracy(args['path'], characters)
+    accuracy, num_gd_rel, num_rel = relationships_accuracy(args['path'], sentiment)
+
+    print("NER results:")
+    print("Correctly found characters: ", correct)
+    print("Total number of found charachters: ", all_charac)
+    print("Number of grountruth characters:", gd_number)
+
+    print("Sentiment results:")
+    print("Correctly found relationships between existing characters: ", accuracy)
+    print("Total number of found relationships: ", num_rel)
+    print("Number of grountruth relationships:", num_gd_rel)
+
     pipeline.knowledge_graph(info)
     ann = json.load(open(args['path'][:-3]+'json'))
     pipeline.knowledge_graph(ann,name='Groundtruth Graph')
+
