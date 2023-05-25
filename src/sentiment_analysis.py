@@ -26,7 +26,7 @@ def sentiment_one_character_stanza(doc, characters, offset):
 def listToValue(sentimentList):
     if len(sentimentList) == 0:
         return
-    d = {-1: sentimentList.count(-1) * 1, 0: sentimentList.count(0) * 1, 1: sentimentList.count(1) * 1}
+    d = {-1: sentimentList.count(-1) * 0.3, 0: sentimentList.count(0) * 0.2, 1: sentimentList.count(1) * 0.5}
     return max(d.items(), key=lambda n: n[1])[0]
 
 
@@ -56,8 +56,7 @@ def sentiment_multiple_characters_stanza(doc, characters, offset):
             row[characters[j]] = []
             for s in range(len(doc.sentences)):
                 if is_character_in_sent(doc.sentences, s, characters[i], offset) and is_character_in_sent(doc.sentences, s, characters[j], offset):
-                        # relationships[f"{characters[i]}/{characters[j]}"].append(calculate_sent_sentiment(doc.sentences, s, offset))
-                    row[characters[j]].append(calculate_sent_sentiment(doc.sentences, s, offset))
+                        row[characters[j]].append(calculate_sent_sentiment(doc.sentences, s, offset))
         relationships[characters[i]] = row
 
     final_relationships = {}
@@ -114,7 +113,6 @@ def sentiment_multiple_characters_afinn(text, characters, offset):
             for s in range(len(sentences)):
                 if characters[i] in sentences[s].lower() and characters[j] in sentences[s].lower():
                     score = eval_afinn(sentences, s, offset)
-                    # relationships[f"{characters[i]}/{characters[j]}"].append(score)
                     row[characters[j]].append(score)
         relationships[characters[i]] = row
 
@@ -126,54 +124,3 @@ def sentiment_multiple_characters_afinn(text, characters, offset):
             if final_value is not None:
                 final_relationships[key].append([k, final_value])
     return final_relationships
-
-if __name__ == "__main__":
-    f = open("../data/our_data/cinderella.txt", "r", encoding='utf-8')
-    text = f.read()
-    nlp = stanza.Pipeline(lang='en', processors='tokenize,sentiment')
-    doc = nlp(text)
-
-    #ground truth character list
-    characters =  ["cinderella", "stepmother", "sisters", "godmother", "prince", "king", "queen"]
-
-    # NER: list of character extracted
-    #entitiesStanza = get_entity_stanza(text)
-    #characters = clean_entities(entitiesStanza)
-    #print(characters)
-    # ['cinderella', 'king', 'prince', 'charlotte']
-
-    # TODO: na kraj od sekoja funckija finalniot sentiment se presmetuva taka sto gleda koj od trite mozni {-1,0,1} se pojavuva najvekje pati, treba da se proba mozda so avg sentiment
-    #SENTIMENT USING STANZA
-    sentiment = sentiment_one_character_stanza(doc, characters, 0)
-    #res: {'cinderella': 0, 'stepmother': 0, 'sisters': 0, 'godmother': 0, 'prince': 0, 'king': 0, 'queen': 1}
-    print(sentiment_multiple_characters_stanza(doc, characters, 0))
-    #res: {'cinderella/stepmother': [], 'cinderella/sisters': [1, -1, 0, 0, 0, 1, 1], 'cinderella/godmother': [0, 0, 1], 'cinderella/prince': [], 'cinderella/king': [], 'cinderella/queen': [], 'stepmother/sisters': [],'stepmother/godmother': [], 'stepmother/prince': [], 'stepmother/king': [], 'stepmother/queen': [], 'sisters/godmother': [0], 'sisters/prince': [0], 'sisters/king': [], 'sisters/queen': [], 'godmother/prince': [], 'godmother/king': [0], 'godmother/queen': [], 'prince/king': [], 'prince/queen': [], 'king/queen': [1]}
-    print(sentiment_multiple_characters_stanza(doc, characters, 1))
-    #res: {'cinderella/stepmother': None, 'cinderella/sisters': 0, 'cinderella/godmother': 0, 'cinderella/prince': 0, 'cinderella/king': 0, 'cinderella/queen': None, 'stepmother/sisters': -1, 'stepmother/godmother': None, 'stepmother/prince': None, 'stepmother/king': None, 'stepmother/queen': None, 'sisters/godmother': 0, 'sisters/prince': 0, 'sisters/king': 0, 'sisters/queen': None, 'godmother/prince': 0, 'godmother/king': 0, 'godmother/queen': None, 'prince/king': 0, 'prince/queen': None, 'king/queen': 1}
-    print(sentiment_multiple_characters_stanza(doc, characters, 2))
-    #res: {'cinderella/stepmother': 0, 'cinderella/sisters': 0, 'cinderella/godmother': 0, 'cinderella/prince': 0,'cinderella/king': 0, 'cinderella/queen': None, 'stepmother/sisters': 0, 'stepmother/godmother': None,'stepmother/prince': None, 'stepmother/king': None, 'stepmother/queen': None, 'sisters/godmother': 0, 'sisters/prince': 0, 'sisters/king': 0, 'sisters/queen': None, 'godmother/prince': 0, 'godmother/king': 0,'godmother/queen': None, 'prince/king': 0, 'prince/queen': 0, 'king/queen': 1}
-    #USING AFINN
-    print(sentiment_one_character_afinn(text,characters, 0))
-    #res: {'cinderella': 1, 'stepmother': -1, 'sisters': 1, 'godmother': 1, 'prince': 1, 'king': 1, 'queen': 1}
-    print(sentiment_one_character_afinn(text,characters, 1))
-    #res: {'cinderella': 1, 'stepmother': 1, 'sisters': 1, 'godmother': 1, 'prince': 1, 'king': 1, 'queen': 1}
-    print(sentiment_one_character_afinn(text, characters, 2))
-    #res: {'cinderella': 1, 'stepmother': 1, 'sisters': 1, 'godmother': 1, 'prince': 1, 'king': 1, 'queen': 1}
-    print(sentiment_multiple_characters_afinn(text,characters, 0))
-    # res: {'cinderella/stepmother': None, 'cinderella/sisters': 1, 'cinderella/godmother': 1, 'cinderella/prince': None,
-    #  'cinderella/king': None, 'cinderella/queen': None, 'stepmother/sisters': None, 'stepmother/godmother': None,
-    #  'stepmother/prince': None, 'stepmother/king': None, 'stepmother/queen': None, 'sisters/godmother': 0,
-    #  'sisters/prince': 0, 'sisters/king': 0, 'sisters/queen': None, 'godmother/prince': None, 'godmother/king': 0,
-    #  'godmother/queen': None, 'prince/king': 1, 'prince/queen': None, 'king/queen': 1}
-    print(sentiment_multiple_characters_afinn(text, characters, 1))
-    # res: {'cinderella/stepmother': None, 'cinderella/sisters': 1, 'cinderella/godmother': 1, 'cinderella/prince': None,
-    #  'cinderella/king': None, 'cinderella/queen': None, 'stepmother/sisters': None, 'stepmother/godmother': None,
-    #  'stepmother/prince': None, 'stepmother/king': None, 'stepmother/queen': None, 'sisters/godmother': 0,
-    #  'sisters/prince': 1, 'sisters/king': -1, 'sisters/queen': None, 'godmother/prince': None, 'godmother/king': 0,
-    #  'godmother/queen': None, 'prince/king': 1, 'prince/queen': None, 'king/queen': 1}
-    print(sentiment_multiple_characters_afinn(text, characters, 2))
-    # res: {'cinderella/stepmother': None, 'cinderella/sisters': 1, 'cinderella/godmother': 1, 'cinderella/prince': None,
-    #  'cinderella/king': None, 'cinderella/queen': None, 'stepmother/sisters': None, 'stepmother/godmother': None,
-    #  'stepmother/prince': None, 'stepmother/king': None, 'stepmother/queen': None, 'sisters/godmother': 0,
-    #  'sisters/prince': 1, 'sisters/king': -1, 'sisters/queen': None, 'godmother/prince': None, 'godmother/king': -1,
-    #  'godmother/queen': None, 'prince/king': 1, 'prince/queen': None, 'king/queen': 1}

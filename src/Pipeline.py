@@ -98,7 +98,6 @@ class Pipeline:
             doc = nlp(text)
             pred = np.unique([ent.text.lower() for sent in doc.sentences for ent in sent.ents if ent.type == 'PERSON'])
         else:
-            # TODO: add different models..
             return
 
         return pred
@@ -168,7 +167,6 @@ if __name__ == "__main__":
 
     print("Loading pipeline..")
     pipeline = Pipeline()
-    # characters = pipeline.extract_characters(args['path'])
 
     print("Extracting characters..")
     characters = pipeline.extract_characters(args['path'], 'stanza')
@@ -182,13 +180,12 @@ if __name__ == "__main__":
 
     print("Sentiment analysis..")
     #possible options for model "stanza" and "afinn"
-    # sentiment = pipeline.sentiment_analysis(args['path'], "afinn", "relationship", characters, 1)
-    sentiment = pipeline.sentiment_analysis(path, "afinn", "relationship", characters, 0)
+    sentiment = pipeline.sentiment_analysis(path, "stanza", "relationship", characters, 2)
 
     if(coref):
         if os.path.exists("../data/coreferenced_data/coref_file.txt"):
             os.remove("../data/coreferenced_data/coref_file.txt")
-    # Add sentiment analysis code
+
     # Make a dictionary that resembles the ground truth annotations (Characters, Relationships)
     info = {"Characters": characters, "Relationships": sentiment}
 
