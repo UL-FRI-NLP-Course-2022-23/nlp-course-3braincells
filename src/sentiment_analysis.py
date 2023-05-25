@@ -26,15 +26,9 @@ def sentiment_one_character_stanza(doc, characters, offset):
 def listToValue(sentimentList):
     if len(sentimentList) == 0:
         return
+    d = {-1: sentimentList.count(-1) * 1, 0: sentimentList.count(0) * 1, 1: sentimentList.count(1) * 1}
+    return max(d.items(), key=lambda n: n[1])[0]
 
-    counter = 0
-    num = sentimentList[0]
-    for i in sentimentList:
-        curr_frequency = sentimentList.count(i)
-        if curr_frequency > counter:
-            counter = curr_frequency
-            num = i
-    return num
 
 def is_character_in_sent(sentences, i, character, offset):
     for j in range(i - offset, i + offset + 1):
@@ -50,14 +44,11 @@ def calculate_sent_sentiment(sentences, i, offset):
     for j in range(i - offset, i + offset + 1):
         if j >= 0 and j < len(sentences):
             sentiment.append(sentences[j].sentiment - 1)
+
     return listToValue(sentiment)
 
 def sentiment_multiple_characters_stanza(doc, characters, offset):
     relationships = {}
-    #makes a dictionary where the keys are the combinations of the characters in "john/jane" form
-    # for i in range(len(characters)):
-    #     for j in range(i + 1, len(characters)):
-    #         relationships[f"{characters[i]}/{characters[j]}"] = []
 
     for i in range(len(characters)):
         row = {}
@@ -115,10 +106,6 @@ def sentiment_multiple_characters_afinn(text, characters, offset):
     #split text into sentences
     sentences = sent_tokenize(text)
     relationships = {}
-    # makes a dictionary where the keys are the combinations of the characters in "john/jane" form
-    # for i in range(len(characters)):
-        # for j in range(i + 1, len(characters)):
-            # relationships[f"{characters[i]}/{characters[j]}"] = []
 
     for i in range(len(characters)):
         row = {}

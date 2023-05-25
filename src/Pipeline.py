@@ -1,6 +1,6 @@
 import logging
 logging.disable(logging.CRITICAL)
-
+import json
 import re
 import argparse
 import pandas as pd
@@ -10,6 +10,8 @@ import stanza
 import networkx as nx
 import matplotlib.pyplot as plt
 from sentiment_analysis import *
+from fastcoref import spacy_component
+import os
 
 logging.getLogger('stanza').setLevel(logging.WARNING) # Set the logging level to WARNING
 
@@ -117,7 +119,15 @@ class Pipeline:
                 sentiment = sentiment_one_character_afinn(text, characters, offset)
         return sentiment
 
-
+    def coreference_resolution(self, path):
+        nlp = spacy.load("en_core_web_sm")
+        nlp.add_pipe("fastcoref")
+        f = open(path, "r", encoding='utf-8')
+        text = f.read()
+        f.close()
+        doc = nlp(text, component_cfg={"fastcoref": {'resolve_text': True}})
+        with open("../data/coreferenced_data/coref_file.txt", 'w', encoding='utf-8') as f:
+            f.write(doc._.resolved_text)
 
     def knowledge_graph(self, info: dict, name:str = 'Knowdlege Graph', save:bool = False):
     # info is dictionary with 'Characters' and 'Relationships'
@@ -136,7 +146,7 @@ class Pipeline:
         node_sizes  = [(v+1) * 500 for v in dict(G.degree()).values()]
         
         plt.figure(figsize=(10, 7))
-        nx.draw_circular(G, edge_color=edge_colors, node_size=node_sizes, with_labels=True, width=1.5, font_size=10)
+        nx.draw_circular(G, edge_color=edge_colors, node_size=node_sizes, with_labels=True, width=1.5, font_size=14)
 
         plt.savefig(name+'.jpg') if save else None
         plt.axis('off')
@@ -150,9 +160,11 @@ if __name__ == "__main__":
         prog='CharacterInteractionPipeline',
         description='The pipeline extracts characters from the text, evaluates the interaction between the characters and builds a knowledge graph from the gathered information.',
         epilog='/')
-
     parser.add_argument('-p', '--path', required=True, help='Path to text')
     args = vars(parser.parse_args())
+
+    #coreference flag
+    coref = True
 
     print("Loading pipeline..")
     pipeline = Pipeline()
@@ -161,11 +173,26 @@ if __name__ == "__main__":
     print("Extracting characters..")
     characters = pipeline.extract_characters(args['path'], 'stanza')
 
+    if(coref):
+        print("Coreference resolution..")
+        pipeline.coreference_resolution(args['path'])
+        path = "../data/coreferenced_data/coref_file.txt"
+    else:
+        path = args['path']
+
     print("Sentiment analysis..")
-    sentiment = pipeline.sentiment_analysis(args['path'], "stanza", "relationship", characters, 1)
+    #possible options for model "stanza" and "afinn"
+    # sentiment = pipeline.sentiment_analysis(args['path'], "afinn", "relationship", characters, 1)
+    sentiment = pipeline.sentiment_analysis(path, "afinn", "relationship", characters, 3)
+
+    if(coref):
+        if os.path.exists("../data/coreferenced_data/coref_file.txt"):
+            os.remove("../data/coreferenced_data/coref_file.txt")
     # Add sentiment analysis code
     # Make a dictionary that resembles the ground truth annotations (Characters, Relationships)
     info = {"Characters": characters, "Relationships": sentiment}
 
     print("Finished!!")
     pipeline.knowledge_graph(info)
+    ann = json.load(open(args['path'][:-3]+'json'))
+    pipeline.knowledge_graph(ann,name='Groundtruth Graph')
