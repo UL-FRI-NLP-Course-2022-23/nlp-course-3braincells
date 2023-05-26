@@ -31,7 +31,7 @@ The annotation file of each story counts three fields:
  ```
  conda activate name=nlp
  ```
- 2. Cloe this project git repository and navigate to the code directory.
+ 2. Clone this project's git repository and navigate to the code directory.
  ```
  git clone https://github.com/UL-FRI-NLP-Course-2022-23/nlp-course-3braincells.git
  ```
@@ -57,8 +57,8 @@ The annotation file of each story counts three fields:
 
 ## Running the code
 
-When running `Pipeline.py` script, located in `src`, we are performing whole project pipeline that consists of the
-following stages: character extraction, coreference resolution, sentiment analysis and visualization.
+When running `Pipeline.py` script, located in `src`, we are performing the whole project pipeline that consists of the
+following stages: character extraction, coreference resolution, sentiment analysis, and visualization.
 
 In order to run the script, you need to provide a path to the story (txt file) as an argument.
 
@@ -68,10 +68,9 @@ Example:
  python Pipeline.py --path "data/Cinderella.txt"
  ```
 
+There is an option inside the script to choose whether you would like to calculate sentiment with coreference resolution being done first or not. Furthermore, you can manually pass the function which model (affin or stanza) would you like to use in order to evaluate sentiment as well as the offset - the range of sentences you would like to consider. 
 
-## Report
-
-More detailed project description and results analysis can be found in provided [PDF](./NLP_Report_Submission2.pdf).
+A more detailed project description and results analysis can be found in provided [PDF](report/NLP_Report_Submission2.pdf).
 
 
 
