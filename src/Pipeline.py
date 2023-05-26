@@ -147,7 +147,6 @@ class Pipeline:
 
         plt.savefig(name+'.jpg') if save else None
         plt.axis('off')
-        plt.title(name)
         plt.show()
 
 
@@ -210,6 +209,4 @@ if __name__ == "__main__":
     print("Number of grountruth relationships:", num_gd_rel)
 
     pipeline.knowledge_graph(info)
-    ann = json.load(open(args['path'][:-3]+'json'))
-    pipeline.knowledge_graph(ann,name='Groundtruth Graph')
 
