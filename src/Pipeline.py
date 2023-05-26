@@ -109,8 +109,6 @@ class Pipeline:
             doc = nlp(text)
             if type == "relationship":
                 sentiment = sentiment_multiple_characters_stanza(doc, characters, offset)
-            else:
-                sentiment = sentiment_one_character_stanza(doc, characters, offset)
         else:
             if type == "relationship":
                 sentiment = sentiment_multiple_characters_afinn(text, characters, offset)
@@ -128,7 +126,7 @@ class Pipeline:
         with open("../data/coreferenced_data/coref_file.txt", 'w', encoding='utf-8') as f:
             f.write(doc._.resolved_text)
 
-    def knowledge_graph(self, info: dict, name:str = 'Knowdlege Graph', save:bool = False):
+    def knowledge_graph(self, info: dict, name:str = 'Knowledge Graph', save:bool = False):
     # info is dictionary with 'Characters' and 'Relationships'
     
         color_map= {-1: 'red', 0: 'gray', 1: 'green'}    
@@ -149,6 +147,7 @@ class Pipeline:
 
         plt.savefig(name+'.jpg') if save else None
         plt.axis('off')
+        plt.title(name)
         plt.show()
 
 
@@ -180,7 +179,7 @@ if __name__ == "__main__":
 
     print("Sentiment analysis..")
     #possible options for model "stanza" and "afinn"
-    sentiment = pipeline.sentiment_analysis(path, "stanza", "relationship", characters, 2)
+    sentiment = pipeline.sentiment_analysis(path, "stanza", "relationship", characters, 0)
 
     if(coref):
         if os.path.exists("../data/coreferenced_data/coref_file.txt"):
@@ -190,6 +189,11 @@ if __name__ == "__main__":
     info = {"Characters": characters, "Relationships": sentiment}
 
     print("Finished!!")
+
+    print("Determining protagonist and antagonist..")
+    protagonist, antagonist = pipeline.sentiment_analysis(path, "afinn", "character", characters, 0)
+    print("Protagonist: ", protagonist)
+    print("Antagonist: ", antagonist)
 
     print("Calculating numerical results..")
     correct, gd_number, all_charac = characters_accuracy(args['path'], characters)
