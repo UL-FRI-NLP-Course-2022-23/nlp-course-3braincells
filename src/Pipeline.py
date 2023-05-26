@@ -194,19 +194,19 @@ if __name__ == "__main__":
     print("Protagonist: ", protagonist)
     print("Antagonist: ", antagonist)
 
-    print("Calculating numerical results..")
-    correct, gd_number, all_charac = characters_accuracy(args['path'], characters)
-    accuracy, num_gd_rel, num_rel = relationships_accuracy(args['path'], sentiment)
+#     print("Calculating numerical results..")
+#     correct, gd_number, all_charac = characters_accuracy(args['path'], characters)
+#     accuracy, num_gd_rel, num_rel = relationships_accuracy(args['path'], sentiment)
 
-    print("NER results:")
-    print("Correctly found characters: ", correct)
-    print("Total number of found charachters: ", all_charac)
-    print("Number of grountruth characters:", gd_number)
+#     print("NER results:")
+#     print("Correctly found characters: ", correct)
+#     print("Total number of found charachters: ", all_charac)
+#     print("Number of grountruth characters:", gd_number)
 
-    print("Sentiment results:")
-    print("Correctly found relationships between existing characters: ", accuracy)
-    print("Total number of found relationships: ", num_rel)
-    print("Number of grountruth relationships:", num_gd_rel)
+#     print("Sentiment results:")
+#     print("Correctly found relationships between existing characters: ", accuracy)
+#     print("Total number of found relationships: ", num_rel)
+#     print("Number of grountruth relationships:", num_gd_rel)
 
     pipeline.knowledge_graph(info)
 
