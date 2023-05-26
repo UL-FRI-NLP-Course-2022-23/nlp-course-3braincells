@@ -1,0 +1,39 @@
+{
+    "Characters": ["hansel", "gretel", "stepmother", "father", "witch", "duck"],
+    "Relationships": {
+        "hansel": [
+            ["stepmother", -1],
+            ["father", 1],
+            ["gretel", 1],
+            ["witch", -1],
+            ["duck", 0]
+        ],
+        "gretel": [
+            ["stepmother", -1],
+            ["father", 1],
+            ["hansel", 1],
+            ["witch", -1],
+            ["duck", 0]
+        ],
+        "stepmother": [
+            ["hansel", -1],
+            ["gretel", -1],
+            ["father", 0]
+        ],
+        "father": [
+            ["hansel", 1],
+            ["gretel", 1],
+            ["stepmother", 0]
+        ],
+        "witch": [
+            ["hansel", -1],
+            ["gretel", -1]
+        ],
+        "duck": [
+            ["hansel", 0],
+            ["gretel", 0]
+        ]
+    },
+    "Protagonist": ["hansel", "gretel"],
+    "Antagonist": "witch"
+}

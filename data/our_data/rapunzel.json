@@ -1,0 +1,27 @@
+{
+    "Characters": ["rapunzel", "enchantress", "woman", "man", "prince"],
+    "Relationships": {
+        "rapunzel": [
+            ["enchantress", -1],
+            ["prince", 1]
+        ],
+        "enchantress": [
+            ["rapunzel", -1],
+            ["prince", -1],
+            ["man", -1]
+        ],
+        "woman": [
+            ["man", 1]
+        ],
+        "man": [
+            ["enchantress", -1],
+            ["woman", 1]
+        ],
+        "prince": [
+            ["rapunzel", 1],
+            ["enchantress", -1]
+        ]
+    },
+    "Protagonist": "rapunzel",
+    "Antagonist": "enchantress"
+}

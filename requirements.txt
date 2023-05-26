@@ -10,4 +10,5 @@ spacy
 spacy_stanza
 stanza
 tqdm
+fastcoref
 networkx
