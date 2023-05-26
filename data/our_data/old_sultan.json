@@ -1,0 +1,21 @@
+{
+    "Characters": ["shepherd ", "sultan", "wife", "wolf", "child"],
+    "Relationships": {
+        "shepherd ": [
+            ["master", 0],
+            ["sultan", 1],
+            ["wife", 0]
+        ],
+        "sultan": [
+            ["wolf", 1],
+            ["shepherd", -1],
+            ["child", 0]
+        ],
+        "wolf": [
+            ["child", 0],
+            ["sultan", -1]
+        ]
+    },
+    "Protagonist": "sultan",
+    "Antagonist": ""
+}
